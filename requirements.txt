@@ -1,0 +1,8 @@
+pandas
+tqdm
+torch
+wtpsplit
+bitsandbytes
+transformers
+accelerate
+sentencepiece
