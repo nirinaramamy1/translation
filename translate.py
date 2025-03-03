@@ -3,7 +3,9 @@ import os
 import re
 import pandas as pd
 import argparse
+import weave
 
+from weave import Dataset
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, BitsAndBytesConfig
 from wtpsplit import SaT
 from tqdm import tqdm
@@ -13,8 +15,7 @@ def get_args():
     parser.add_argument("--input", type=str, required=True, help="Input Parquet file path")
     parser.add_argument("--column1", type=str, required=True, help="First column name to translate")
     parser.add_argument("--column2", type=str, required=True, help="Second column name to translate")
-    parser.add_argument("--output_dir", type=str, required=True, help="Directory to save translated files")
-    parser.add_argument("--output_filename", type=str, default="natural-questions-part", help="Base filename for output files")
+    parser.add_argument("--weave_output", type=str, required=True, help="Base filename for output files to weave dataset")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for translation")
     parser.add_argument("--chunk_size", type=int, default=1, help="Chunk size for processing")
     return parser.parse_args()
@@ -72,27 +73,25 @@ tqdm.pandas(desc="Translating")
 
 df = pd.read_parquet(args.input)
 
-if os.path.exists(args.output_dir) and os.listdir(args.output_dir):
-    filename = sorted(os.listdir(args.output_dir))[-1]
-    match = re.search(r"(?<=part)\d+(?=\.csv)", filename)
-    if match:
-        part_number = int(match.group(0))
-        checkpoint_range = part_number * args.chunk_size
-    else:
-        part_number = 0
-        checkpoint_range = 0
-else:
-    os.makedirs(args.output_dir, exist_ok=True)
-    part_number = 0
-    checkpoint_range = 0
+weave.init(f'{args.weave_output}')
+try:
+    df_ref = weave.ref(f'{args.weave_output}').get().to_pandas()
+except:
+    df_ref = pd.DataFrame([
+        {f'{args.column1}': '', f'{args.column2}': ''}
+    ])
 
-chunks = [df[i:i + args.chunk_size] for i in range(checkpoint_range, len(df), args.chunk_size)]
-for i, chunk in enumerate(chunks, part_number + 1):
+chunks = [df[i:i + args.chunk_size] for i in range(len(df_ref), len(df), args.chunk_size)]
+for chunk in chunks:
     result = chunk.progress_apply(
         lambda row: [translate(row[args.column1], args.batch_size), translate(row[args.column2], args.batch_size)],
         axis=1, result_type='expand'
     )
     result.columns = [args.column1, args.column2]
-    output_file = os.path.join(args.output_dir, f'{args.output_filename}{i}.csv')
-    result.to_csv(output_file, index=False)
+    df_pub = pd.concat([df_ref, result], axis=0, ignore_index=0)
+    dataset = Dataset(
+        name=f'{args.weave_output}',
+        rows=df_pub.to_dict(orient='records')
+    )
+    weave.publish(dataset)
     torch.cuda.empty_cache()

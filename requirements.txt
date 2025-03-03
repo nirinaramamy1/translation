@@ -1,5 +1,7 @@
 pandas
 tqdm
+wandb
+weave
 torch
 wtpsplit
 bitsandbytes
