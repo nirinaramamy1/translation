@@ -94,4 +94,6 @@ for chunk in chunks:
         rows=df_pub.to_dict(orient='records')
     )
     weave.publish(dataset)
+    df_ref = weave.ref(f'{args.weave_output}').get().to_pandas()
+    chunks = [df[i:i + args.chunk_size] for i in range(len(df_ref), len(df), args.chunk_size)]
     torch.cuda.empty_cache()
