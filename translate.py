@@ -20,7 +20,7 @@ def get_args():
     parser.add_argument("--column2", type=str, required=True, help="Second column name to translate")
     parser.add_argument("--weave_output", type=str, required=True, help="Base filename for output files to weave dataset")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for translation")
-    parser.add_argument("--chunk_size", type=int, default=1, help="Chunk size for processing")
+    parser.add_argument("--chunk_size", type=int, default=50, help="Chunk size for processing")
     return parser.parse_args()
 
 args = get_args()
