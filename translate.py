@@ -4,11 +4,14 @@ import re
 import pandas as pd
 import argparse
 import weave
+import warnings
 
 from weave import Dataset
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, BitsAndBytesConfig
 from wtpsplit import SaT
 from tqdm import tqdm
+
+warnings.simplefilter("ignore", DeprecationWarning)
 
 def get_args():
     parser = argparse.ArgumentParser(description="Translate dataset using MADLAD model")
