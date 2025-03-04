@@ -55,7 +55,7 @@ Les données traduites sont stockées dans la plateforme weights and biases sous
 
 ## Les arguments dans le code **translate.py**
 
-![Capture d’écran du 2025-03-04 15-38-10](https://github.com/user-attachments/assets/8c482d53-1602-473b-93af-18a02efbe6cc)
+![Capture d’écran du 2025-03-04 16-20-38](https://github.com/user-attachments/assets/f056bfb5-64ce-444f-b786-012e4dcb3d86)
 
 **--input** : Lien des données fourni dans la plateforme Hugging Face en format pandas.
 
