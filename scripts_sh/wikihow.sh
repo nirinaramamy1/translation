@@ -9,4 +9,6 @@ python translate.py \
   --column2 "summary" \
   --weave_output "wikihow" \
   --batch_size 8 \
-  --chunk_size 50
+  --chunk_size 50 \
+  --range_begin 0 \
+  --range_end 10000

@@ -21,6 +21,8 @@ def get_args():
     parser.add_argument("--weave_output", type=str, required=True, help="Base filename for output files to weave dataset")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for translation")
     parser.add_argument("--chunk_size", type=int, default=50, help="Chunk size for processing")
+    parser.add_argument("--range_begin", type=int, required=True, help="Begin from this range to translate")
+    parser.add_argument("--range_end", type=int, required=True, help="End of range to translate")
     return parser.parse_args()
 
 args = get_args()
@@ -84,7 +86,7 @@ except:
         {f'{args.column1}': '', f'{args.column2}': ''}
     ])
 
-chunks = [df[i:i + args.chunk_size] for i in range(len(df_ref), len(df), args.chunk_size)]
+chunks = [df[i:i + args.chunk_size] for i in range(len(df_ref)+args.range_begin, len(df_ref)+args.range_end, args.chunk_size)]
 for chunk in chunks:
     result = chunk.progress_apply(
         lambda row: [translate(row[args.column1], args.batch_size), translate(row[args.column2], args.batch_size)],
@@ -97,6 +99,6 @@ for chunk in chunks:
         rows=df_pub.to_dict(orient='records')
     )
     weave.publish(dataset)
-    df_ref = weave.ref(f'{args.weave_output}').get().to_pandas()
-    chunks = [df[i:i + args.chunk_size] for i in range(len(df_ref), len(df), args.chunk_size)]
+    # df_ref = weave.ref(f'{args.weave_output}').get().to_pandas()
+    # chunks = [df[i:i + args.chunk_size] for i in range(len(df_ref)+args.range_begin, len(df), args.chunk_size)]
     torch.cuda.empty_cache()
