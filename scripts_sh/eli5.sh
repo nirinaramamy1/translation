@@ -7,7 +7,7 @@ python translate.py \
   --input "hf://datasets/sentence-transformers/eli5/pair/train-00000-of-00001.parquet" \
   --column1 "question" \
   --column2 "answer" \
-  --weave_output "eli5" \
+  --weave_output "eli5:v561" \
   --batch_size 8 \
   --chunk_size 50 \
   --range_begin 0 \
