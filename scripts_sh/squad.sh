@@ -7,7 +7,7 @@ python translate.py \
   --input "hf://datasets/sentence-transformers/squad/pair/train-00000-of-00001.parquet" \
   --column1 "question" \
   --column2 "answer" \
-  --weave_output "squad" \
+  --weave_output "squad:v90" \
   --batch_size 8 \
   --chunk_size 50 \
   --range_begin 0 \
