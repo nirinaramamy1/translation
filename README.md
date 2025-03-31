@@ -68,3 +68,7 @@ Les données traduites sont stockées dans la plateforme weights and biases sous
 **--batch_size** : Valeur recommendée entre 8 à 32 y compris, exemple 8, 16, 32. Augmenter selon la puissance du GPU, pour un GPU assez puissant la valeur 16 ou 32 est idéale.
 
 **--chunk_size** : Seuil de données traduites à publier dans la plateforme **wandb**. Exemple 50, puis 50 ligne données a été traduites, le seuil 50 est atteint donc les 50 lignes données traduites seront publiées dans la plateforme **wandb**.
+
+**--range_begin** : L'indice pour commencer la traduction
+
+**--range_end** : L'indice pour finir la traduction
