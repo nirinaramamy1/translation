@@ -77,26 +77,30 @@ def translate(text, batch_size=8):
 tqdm.pandas(desc="Translating")
 
 df = pd.read_parquet(args.input)
+df_last = df.iloc[::-1].reset_index(drop=True)
+
 
 weave.init(f'{args.weave_output}')
-try:
-    df_ref = weave.ref(f'{args.weave_output}').get().to_pandas()
-except:
-    df_ref = pd.DataFrame([
-        {f'{args.column1}': '', f'{args.column2}': ''}
-    ])
+# try:
+#     df_ref = weave.ref(f'{args.weave_output}').get().to_pandas()
+# except:
+#     df_ref = pd.DataFrame([
+#         {f'{args.column1}': '', f'{args.column2}': ''}
+#     ])
 
-chunks = [df[i:i + args.chunk_size] for i in range(len(df_ref)+args.range_begin, len(df_ref)+args.range_end, args.chunk_size)]
+# chunks = [df[i:i + args.chunk_size] for i in range(len(df_ref)+args.range_begin, len(df_ref)+args.range_end, args.chunk_size)]
+chunks = [df_last[i:i + args.chunk_size] for i in range(args.range_begin, args.range_end, args.chunk_size)]
 for chunk in chunks:
     result = chunk.progress_apply(
         lambda row: [translate(row[args.column1], args.batch_size), translate(row[args.column2], args.batch_size)],
         axis=1, result_type='expand'
     )
     result.columns = [args.column1, args.column2]
-    df_pub = pd.concat([df_ref, result], axis=0, ignore_index=0)
+    # df_pub = pd.concat([df_ref, result], axis=0, ignore_index=0)
     dataset = Dataset(
         name=f'{args.weave_output}',
-        rows=df_pub.to_dict(orient='records')
+        rows=result.to_dict(orient='records')
+        # rows=df_pub.to_dict(orient='records')
     )
     weave.publish(dataset)
     # df_ref = weave.ref(f'{args.weave_output}').get().to_pandas()

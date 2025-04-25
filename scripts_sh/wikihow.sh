@@ -7,7 +7,7 @@ python translate.py \
   --input "hf://datasets/sentence-transformers/wikihow/pair/train-00000-of-00001.parquet" \
   --column1 "text" \
   --column2 "summary" \
-  --weave_output "wikihow:v775" \
+  --weave_output "wikihow-last" \
   --batch_size 8 \
   --chunk_size 50 \
   --range_begin 0 \
