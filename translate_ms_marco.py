@@ -1,12 +1,9 @@
 import torch
-import gdown
-import os
-import re
-import pandas as pd
 import argparse
 import weave
 import warnings
 
+from datasets import load_dataset
 from weave import Dataset
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, BitsAndBytesConfig
 from wtpsplit import SaT
@@ -16,9 +13,8 @@ warnings.simplefilter("ignore", DeprecationWarning)
 
 def get_args():
     parser = argparse.ArgumentParser(description="Translate dataset using MADLAD model")
-    parser.add_argument("--input", type=str, required=True, help="Input Parquet file path")
-    parser.add_argument("--output", type=str, required=True, help="Output file path")
-    parser.add_argument("--column1", type=str, required=True, help="First column name to translate")
+    parser.add_argument("--input", type=str, required=True, help="Input Huggingface Data")
+    parser.add_argument("--column1", type=str, required=True, help="First column name is id")
     parser.add_argument("--column2", type=str, required=True, help="Second column name to translate")
     parser.add_argument("--weave_output", type=str, required=True, help="Base filename for output files to weave dataset")
     parser.add_argument("--batch_size", type=int, default=8, help="Batch size for translation")
@@ -78,20 +74,13 @@ def translate(text, batch_size=8):
 
 tqdm.pandas(desc="Translating")
 
-output = args.output
-gdown.download(args.input, output, quiet=False)
-
+ds_queries = load_dataset(args.input)
 nrows = args.range_end - args.range_begin
-df = pd.read_table(
-    output,
-    names=[args.column1, args.column2],
-    skiprows=range(args.range_begin),
-    nrows=nrows,
-)
+df = ds_queries["train"].select(range(args.range_begin, args.range_end)).to_pandas()
 
 weave.init(f'{args.weave_output}')
 
-chunks = [df[i:i + args.chunk_size] for i in range(nrows, args.chunk_size)]
+chunks = [df[i:i + args.chunk_size] for i in range(0, nrows, args.chunk_size)]
 for chunk in chunks:
     result = chunk.progress_apply(
         lambda row: [row[args.column1], translate(row[args.column2], args.batch_size)],
