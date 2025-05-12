@@ -1,7 +1,7 @@
 #!/bin/bash
 python -m pip install -r requirements.txt
 
-wandb login 2570172483ba90dcd524a971e6a6efe6aa0f6581
+wandb login d005488f55ff93ac572938433632aa0c2e651420
 
 python translate_ms_marco.py \
   --input "Maminirina1/queries" \
