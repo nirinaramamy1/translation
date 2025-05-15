@@ -64,7 +64,11 @@ sat = SaT("sat-3l")
 sat.half().to("cuda")
 
 def translate(text, batch_size=8):
+    data_type = args.input.split("/")[1]
     split_phrases = sat.split(text)
+    if data_type == "queries":
+        split_phrases = sat.split(text)
+        split_phrases = [''.join(split_phrases)]
     translated_phrases = []
     for i in range(0, len(split_phrases), batch_size):
         batch = split_phrases[i:i + batch_size]
