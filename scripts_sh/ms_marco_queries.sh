@@ -1,5 +1,6 @@
 #!/bin/bash
 python -m pip install -r requirements.txt
+pip install -U datasets
 
 wandb login d005488f55ff93ac572938433632aa0c2e651420
 
