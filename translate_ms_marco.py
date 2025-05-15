@@ -9,7 +9,7 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, BitsAndBytesConfi
 from wtpsplit import SaT
 from tqdm import tqdm
 
-warnings.simplefilter("ignore", DeprecationWarning)
+warnings.filterwarnings("ignore")
 
 def get_args():
     parser = argparse.ArgumentParser(description="Translate dataset using MADLAD model")
